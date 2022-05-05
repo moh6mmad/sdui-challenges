@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\NewsCreated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +16,10 @@ class News extends Model
         'user_id'
     ];
 
+    protected $dispatchesEvents = [
+        "created" => NewsCreated::class,
+    ];
+    
     /**
      * Return news author
      * 
