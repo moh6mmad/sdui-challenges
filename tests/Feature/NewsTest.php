@@ -6,16 +6,24 @@ use App\Models\News;
 use App\Models\User;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class NewsTests extends TestCase
 {
     use RefreshDatabase;
     use Authenticatable;
-    use WithoutMiddleware;
+    use WithFaker;
 
+    protected $user;
+    protected $news;
 
+    protected function setup(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->news = News::factory()->create();
+    }
     
     /**
      * A basic feature test to check news index.
@@ -24,6 +32,7 @@ class NewsTests extends TestCase
      */
     public function testNewsShow()
     {
+        $this->actingAs($this->user);
         $response = $this->json('GET', '/news');
         $response->assertStatus(200)->assertSee('data');
     }
@@ -35,8 +44,8 @@ class NewsTests extends TestCase
      */
     public function testCreateNews()
     {
-        $this->actingAs(User::factory()->create())
-        ->json('POST', '/news', ['title' => 'test', 'content' => 'content test'])
+        $this->actingAs($this->user)
+        ->json('POST', '/news', ['title' => $this->faker->realText(50), 'content' => $this->faker->paragraph(),])
         ->assertStatus(201)
         ->assertSee('data');
     }
@@ -48,11 +57,15 @@ class NewsTests extends TestCase
      */
     public function testUpdateNews()
     {
-        $user = User::factory()->create();
-        $news = News::factory()->create();
-        $this->actingAs($user)
-        ->json('PUT', '/news/' . $news->id, ['title' => 'update test', 'content' => 'content test'])
+        $title = $this->faker->realText(50);
+        $content = $this->faker->paragraph();
+        $this->actingAs($this->user)
+        ->json('PUT', '/news/' . $this->news->id, ['title' => $title, 'content' => $content])
         ->assertStatus(200)
+        ->assertJsonFragment([
+            'title' => $title,
+            'content' => $content,
+        ])
         ->assertSee('data');
     }
 
@@ -63,10 +76,25 @@ class NewsTests extends TestCase
      */
     public function testDeleteNews()
     {
-        $user = User::factory()->create();
-        $news = News::factory()->create();
-        $this->actingAs($user)
-        ->json('DELETE', '/news/' . $news->id)
+        $this->actingAs($this->user)
+        ->json('DELETE', '/news/' . $this->news->id)
         ->assertStatus(204);
+    }
+
+    /**
+     * A basic feature test to check news index.
+     *
+     * @return void
+     */
+    public function testAssignNews()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)
+        ->json('POST', route('news.assign', $this->news))
+        ->assertJsonFragment([
+            'name' => $user->name,
+            'email' => $user->email,
+        ])
+        ->assertStatus(201);
     }
 }
