@@ -83,6 +83,7 @@ class NewsController extends Controller
      * Assign a news to given user
      * 
      * @param News $news
+     * @param Request $request
      * @return Response
      */
     public function assign(News $news, Request $request): Response

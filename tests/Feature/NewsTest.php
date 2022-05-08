@@ -26,7 +26,7 @@ class NewsTests extends TestCase
     }
     
     /**
-     * A basic feature test to check news index.
+     * A feature test to check news index.
      *
      * @return void
      */
@@ -38,7 +38,7 @@ class NewsTests extends TestCase
     }
 
     /**
-     * A basic feature test to check news index.
+     * A feature test to check news index.
      *
      * @return void
      */
@@ -51,7 +51,7 @@ class NewsTests extends TestCase
     }
 
     /**
-     * A basic feature test to check news index.
+     * A feature test to check news index.
      *
      * @return void
      */
@@ -63,14 +63,14 @@ class NewsTests extends TestCase
         ->json('PUT', '/news/' . $this->news->id, ['title' => $title, 'content' => $content])
         ->assertStatus(200)
         ->assertJsonFragment([
-            'title' => $title,
+            'title'   => $title,
             'content' => $content,
         ])
         ->assertSee('data');
     }
 
     /**
-     * A basic feature test to check news index.
+     * A feature test to check news index.
      *
      * @return void
      */
@@ -82,7 +82,7 @@ class NewsTests extends TestCase
     }
 
     /**
-     * A basic feature test to check news index.
+     * A feature test to check news index.
      *
      * @return void
      */
@@ -92,7 +92,7 @@ class NewsTests extends TestCase
         $this->actingAs($user)
         ->json('POST', route('news.assign', $this->news))
         ->assertJsonFragment([
-            'name' => $user->name,
+            'name'  => $user->name,
             'email' => $user->email,
         ])
         ->assertStatus(201);
